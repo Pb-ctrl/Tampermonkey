@@ -2,7 +2,7 @@
 // @name         自动取消下一步（YouTube 和 Bilibili）
 // @name:en      Auto Cancel Up Next (YouTube & Bilibili)
 // @namespace    http://tampermonkey.net/
-// @version      2024-11-24_1.1.2
+// @version      2024-11-24_1.1.3
 // @description:zh-CN  自动取消 YouTube 和 Bilibili 视频播放完成后的推荐视频操作
 // @description  Automatically cancel recommended video actions after YouTube and Bilibili videos have finished playing
 // @author       屑屑
@@ -11,8 +11,8 @@
 // @icon         https://s2.loli.net/2024/04/28/WEkjH9iy51z63Of.jpg
 // @grant        none
 // @license      MIT
-// @downloadURL https://update.greasyfork.org/scripts/518657/%E8%87%AA%E5%8A%A8%E5%8F%96%E6%B6%88%E4%B8%8B%E4%B8%80%E6%AD%A5%EF%BC%88YouTube%20%E5%92%8C%20Bilibili%EF%BC%89.user.js
-// @updateURL https://update.greasyfork.org/scripts/518657/%E8%87%AA%E5%8A%A8%E5%8F%96%E6%B6%88%E4%B8%8B%E4%B8%80%E6%AD%A5%EF%BC%88YouTube%20%E5%92%8C%20Bilibili%EF%BC%89.meta.js
+// @downloadURL  https://update.greasyfork.org/scripts/518657/%E8%87%AA%E5%8A%A8%E5%8F%96%E6%B6%88%E4%B8%8B%E4%B8%80%E6%AD%A5%EF%BC%88YouTube%20%E5%92%8C%20Bilibili%EF%BC%89.user.js
+// @updateURL    https://update.greasyfork.org/scripts/518657/%E8%87%AA%E5%8A%A8%E5%8F%96%E6%B6%88%E4%B8%8B%E4%B8%80%E6%AD%A5%EF%BC%88YouTube%20%E5%92%8C%20Bilibili%EF%BC%89.meta.js
 // ==/UserScript==
 (function () {
     'use strict';
@@ -42,6 +42,7 @@
                 if (button) {
                     button.click();
                     console.log('Bilibili: 取消按钮已点击');
+                    document.querySelector("div.bpx-player-ctrl-btn.bpx-player-ctrl-web").click();
                     observer.disconnect(); // 成功点击后停止观察
                 }
             });
