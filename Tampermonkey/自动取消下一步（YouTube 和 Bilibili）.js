@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         自动取消下一步（YouTube 和 Bilibili）
+// @name         自动取消连播（YouTube 和 Bilibili）
 // @name:en      Auto Cancel Up Next (YouTube & Bilibili)
 // @namespace    http://tampermonkey.net/
 // @version      2024-11-24_1.1.3
