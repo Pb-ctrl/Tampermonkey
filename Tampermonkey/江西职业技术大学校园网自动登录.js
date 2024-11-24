@@ -1,6 +1,5 @@
 // ==UserScript==
 // @name:zh-CN   江西职业技术大学校园网自动登录
-// @name         (旧：九江职业技术学院)
 // @namespace    http://tampermonkey.net/
 // @version      1.2.9.1
 // @description  可以用于校园网快速登录(无需手动操作),脚本的功能仅限于自动填充登录表单并模拟登录操作，没有执行任何超出这一范围的活动，也没有从外部网站加载任何代码或数据。
