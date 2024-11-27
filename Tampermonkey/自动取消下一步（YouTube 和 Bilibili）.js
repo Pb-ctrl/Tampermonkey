@@ -1,13 +1,16 @@
 // ==UserScript==
-// @name         自动取消连播（YouTube 和 Bilibili）
+// @name         自动取消下一步（YouTube 和 Bilibili）
 // @name:en      Auto Cancel Up Next (YouTube & Bilibili)
 // @namespace    http://tampermonkey.net/
-// @version      2024-11-24_1.1.3
+// @version      2024-11-24_1.1.5
 // @description:zh-CN  自动取消 YouTube 和 Bilibili 视频播放完成后的推荐视频操作
 // @description  Automatically cancel recommended video actions after YouTube and Bilibili videos have finished playing
 // @author       屑屑
-// @match        *://www.youtube.com/watch*
+// @match        *://www.youtube.com/*
+// @match        *://m.youtube.com/*
+// @match        *://www.youtube-nocookie.com/*
 // @match        *://www.bilibili.com/video/*
+// @exclude      *://www.youtube.com/live_chat*
 // @icon         https://s2.loli.net/2024/04/28/WEkjH9iy51z63Of.jpg
 // @grant        none
 // @license      MIT
@@ -29,6 +32,7 @@
                     if (button) {
                         button.click();
                         console.log('YouTube: 取消按钮已点击');
+                        document.querySelector("#movie_player > div.ytp-chrome-bottom > div.ytp-chrome-controls > div.ytp-right-controls > button.ytp-fullscreen-button.ytp-button").click();
                     } else {
                         console.log('YouTube: 未找到取消按钮');
                     }

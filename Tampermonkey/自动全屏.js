@@ -2,7 +2,7 @@
 // @name         自动全屏
 // @name:en      Automatic full screen
 // @namespace    http://tampermonkey.net/
-// @version      1.2.1
+// @version      1.3
 // @description:zh-CN  自动实现B站和YouTube网页视频的全屏观看功能。  
 // @description  Automatically realize the full-screen viewing function of Bilibili and YouTube web videos.
 // @author       屑屑
