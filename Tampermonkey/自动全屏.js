@@ -2,7 +2,7 @@
 // @name         自动全屏
 // @name:en      Automatic full screen
 // @namespace    http://tampermonkey.net/
-// @version      1.3
+// @version      1.4
 // @description:zh-CN  自动实现B站和YouTube网页视频的全屏观看功能。  
 // @description  Automatically realize the full-screen viewing function of Bilibili and YouTube web videos.
 // @author       屑屑
@@ -10,18 +10,14 @@
 // @license      MIT
 // @match        *://www.youtube.com/watch*
 // @match        *://www.bilibili.com/video/*
-// @license      MIT
 // @downloadURL  https://update.greasyfork.org/scripts/518562/%E8%87%AA%E5%8A%A8%E5%85%A8%E5%B1%8F.user.js
 // @updateURL    https://update.greasyfork.org/scripts/518562/%E8%87%AA%E5%8A%A8%E5%85%A8%E5%B1%8F.meta.js
 // ==/UserScript==
 
 window.onload = () => {
-    // YouTube 和 Bilibili 的全屏按钮选择器
     const youtubeSelector = "button.ytp-fullscreen-button.ytp-button";
     const bilibiliSelector = "#bilibili-player .bpx-player-ctrl-web";
     const videoSelector = "video";  // 视频元素的通用选择器
-
-    let isFullscreen = false;  // 标记是否已进入全屏模式
 
     // 等待元素加载的通用函数
     const waitForElement = (selector) => {
@@ -80,7 +76,6 @@ window.onload = () => {
             if (currentWidth !== initialWidth || currentHeight !== initialHeight) {
                 console.log("视频尺寸已变化，进入全屏成功！");
                 resizeObserver.disconnect();  // 停止监听尺寸变化
-                isFullscreen = true;  // 标记已进入全屏
             }
         });
 
@@ -103,25 +98,18 @@ window.onload = () => {
         const tryFullscreenUntilSuccess = () => {
             const videoElement = document.querySelector(videoSelector);
 
-            if (!isFullscreen) {
-                setTimeout(() => {
-                    const currentWidth = videoElement.offsetWidth;
-                    const currentHeight = videoElement.offsetHeight;
+            setTimeout(() => {
+                const currentWidth = videoElement.offsetWidth;
+                const currentHeight = videoElement.offsetHeight;
 
-                    // 如果尺寸没有变化，则尝试强制进入全屏
-                    if (currentWidth === videoElement.offsetWidth && currentHeight === videoElement.offsetHeight) {
-                        console.log("视频尺寸未变化，尝试其他方式进入全屏...");
-
-                        // 尝试通过其他方式进入全屏
-                        enterFullscreen();
-
-                        // 继续尝试直到成功
-                        tryFullscreenUntilSuccess();
-                    } else {
-                        console.log("成功进入全屏！");
-                    }
-                }, 1000);  // 每1秒检查一次
-            }
+                if (currentWidth === videoElement.offsetWidth && currentHeight === videoElement.offsetHeight) {
+                    console.log("视频尺寸未变化，尝试其他方式进入全屏...");
+                    enterFullscreen();  // 强制进入全屏
+                    tryFullscreenUntilSuccess();  // 继续尝试直到成功
+                } else {
+                    console.log("成功进入全屏！");
+                }
+            }, 1000);  // 每1秒检查一次
         };
 
         // 启动持续检测
