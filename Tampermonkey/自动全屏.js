@@ -2,8 +2,8 @@
 // @name         自动全屏
 // @name:en      Automatic full screen
 // @namespace    http://tampermonkey.net/
-// @version      1.4
-// @description:zh-CN  自动实现B站和YouTube网页视频的全屏观看功能。  
+// @version      1.4.1
+// @description:zh-CN  自动实现B站和YouTube网页视频的全屏观看功能。
 // @description  Automatically realize the full-screen viewing function of Bilibili and YouTube web videos.
 // @author       屑屑
 // @icon         https://s2.loli.net/2024/04/28/WEkjH9iy51z63Of.jpg
@@ -14,108 +14,105 @@
 // @updateURL    https://update.greasyfork.org/scripts/518562/%E8%87%AA%E5%8A%A8%E5%85%A8%E5%B1%8F.meta.js
 // ==/UserScript==
 
-window.onload = () => {
+(function() {
+    'use strict';
+
+    // 选择器
     const youtubeSelector = "button.ytp-fullscreen-button.ytp-button";
     const bilibiliSelector = "#bilibili-player .bpx-player-ctrl-web";
-    const videoSelector = "video";  // 视频元素的通用选择器
 
-    // 等待元素加载的通用函数
-    const waitForElement = (selector) => {
-        return new Promise((resolve) => {
-            const interval = setInterval(() => {
-                const element = document.querySelector(selector);
-                if (element) {
-                    clearInterval(interval);
-                    resolve(element);
-                }
-            }, 500); // 每500毫秒检查一次
-        });
-    };
+    // 判断当前页面是 YouTube 还是 Bilibili
+    const isYoutube = window.location.host.includes('youtube.com');
+    const isBilibili = window.location.host.includes('bilibili.com');
 
-    // 执行点击操作
-    const clickButton = async (selector, platform) => {
-        try {
-            const button = await waitForElement(selector);
-            button.click();
-            console.log(`${platform} 全屏按钮已点击！`);
-        } catch (error) {
-            console.error(`${platform} 全屏按钮未找到！`, error);
+    // 等待视频加载完成并开始播放
+    function waitForVideoToPlay() {
+        const video = document.querySelector("video");
+        if (video && video.readyState === 4 && !video.paused) {
+            console.log("视频已加载并开始播放");
+            return true;
         }
-    };
+        console.log("等待视频加载并开始播放...");
+        return false;
+    }
 
-    // 直接进入全屏
-    const enterFullscreen = () => {
-        const videoElement = document.querySelector(videoSelector);
-        if (videoElement) {
-            try {
-                if (videoElement.requestFullscreen) {
-                    videoElement.requestFullscreen();
-                    console.log("已进入全屏模式");
-                } else {
-                    console.error("该浏览器不支持 requestFullscreen");
-                }
-            } catch (error) {
-                console.error("进入全屏模式时发生错误:", error.message);
+    // 保存原有的窗口尺寸
+    let originalWidth, originalHeight;
+    function saveWindowSize() {
+        const video = document.querySelector("video");
+        if (video) {
+            originalWidth = video.offsetWidth;
+            originalHeight = video.offsetHeight;
+            console.log(`保存原有尺寸：宽度 = ${originalWidth}, 高度 = ${originalHeight}`);
+        } else {
+            console.log("未找到视频元素，无法保存尺寸");
+        }
+    }
+
+    // 点击全屏按钮
+    function clickFullscreenButton() {
+        if (isYoutube) {
+            const fullscreenButton = document.querySelector(youtubeSelector);
+            if (fullscreenButton) {
+                fullscreenButton.click();
+                console.log("YouTube 全屏按钮已点击");
+            } else {
+                console.log("未找到 YouTube 全屏按钮");
+            }
+        } else if (isBilibili) {
+            const fullscreenButton = document.querySelector(bilibiliSelector);
+            if (fullscreenButton) {
+                fullscreenButton.click();
+                console.log("Bilibili 全屏按钮已点击");
+            } else {
+                console.log("未找到 Bilibili 全屏按钮");
             }
         } else {
-            console.error("未找到视频元素");
+            console.log("未识别到支持的平台");
         }
-    };
+    }
 
-    // 持续监听视频尺寸变化
-    const observeVideoSize = (videoElement) => {
-        const initialWidth = videoElement.offsetWidth;
-        const initialHeight = videoElement.offsetHeight;
-
-        // 创建 ResizeObserver 来观察视频尺寸变化
-        const resizeObserver = new ResizeObserver(() => {
-            const currentWidth = videoElement.offsetWidth;
-            const currentHeight = videoElement.offsetHeight;
-
-            // 如果视频尺寸发生变化，说明全屏成功
-            if (currentWidth !== initialWidth || currentHeight !== initialHeight) {
-                console.log("视频尺寸已变化，进入全屏成功！");
-                resizeObserver.disconnect();  // 停止监听尺寸变化
+    // 检查窗口尺寸是否变化
+    function hasWindowSizeChanged() {
+        const video = document.querySelector("video");
+        if (video) {
+            const hasChanged = video.offsetWidth !== originalWidth || video.offsetHeight !== originalHeight;
+            if (hasChanged) {
+                console.log(`窗口尺寸已变化：新宽度 = ${video.offsetWidth}, 新高度 = ${video.offsetHeight}`);
+            } else {
+                console.log("窗口尺寸未变化");
             }
-        });
-
-        resizeObserver.observe(videoElement);  // 开始监听
-    };
-
-    // 模拟点击全屏按钮并监听视频尺寸变化
-    const handlePlatform = async () => {
-        if (window.location.hostname.includes('youtube.com')) {
-            await clickButton(youtubeSelector, 'YouTube');
-        } else if (window.location.hostname.includes('bilibili.com')) {
-            await clickButton(bilibiliSelector, 'Bilibili');
+            return hasChanged;
         }
+        console.log("无法获取视频尺寸，未检测到尺寸变化");
+        return false;
+    }
 
-        // 获取视频元素并开始观察其尺寸变化
-        const videoElement = await waitForElement(videoSelector);
-        observeVideoSize(videoElement);
+    // 主逻辑：等待视频播放并执行操作
+    function main() {
+        if (waitForVideoToPlay()) {
+            saveWindowSize(); // 保存原始尺寸
+            clickFullscreenButton(); // 尝试点击全屏按钮
 
-        // 如果视频尺寸没有变化，逐步尝试其他方式进入全屏
-        const tryFullscreenUntilSuccess = () => {
-            const videoElement = document.querySelector(videoSelector);
-
+            // 等待一定时间以确保尺寸变化
             setTimeout(() => {
-                const currentWidth = videoElement.offsetWidth;
-                const currentHeight = videoElement.offsetHeight;
-
-                if (currentWidth === videoElement.offsetWidth && currentHeight === videoElement.offsetHeight) {
-                    console.log("视频尺寸未变化，尝试其他方式进入全屏...");
-                    enterFullscreen();  // 强制进入全屏
-                    tryFullscreenUntilSuccess();  // 继续尝试直到成功
-                } else {
-                    console.log("成功进入全屏！");
+                if (!hasWindowSizeChanged()) {
+                    // 如果没有变化，执行请求全屏
+                    console.log("尝试通过requestFullscreen将视频全屏");
+                    document.querySelector("video").requestFullscreen();
                 }
-            }, 1000);  // 每1秒检查一次
-        };
+                // 脚本结束
+                console.log("脚本执行完毕");
+            }, 1000); // 等待 1 秒钟以检测尺寸变化
+        } else {
+            // 继续等待视频开始播放
+            console.log("视频尚未播放，继续等待...");
+            setTimeout(main, 500);
+        }
+    }
 
-        // 启动持续检测
-        tryFullscreenUntilSuccess();
-    };
+    // 启动脚本
+    console.log("脚本启动...");
+    main();
 
-    // 执行平台操作
-    handlePlatform();
-};
+})();

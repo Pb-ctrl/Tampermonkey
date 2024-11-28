@@ -6,11 +6,8 @@
 // @description:zh-CN  自动取消 YouTube 和 Bilibili 视频播放完成后的推荐视频操作
 // @description  Automatically cancel recommended video actions after YouTube and Bilibili videos have finished playing
 // @author       屑屑
-// @match        *://www.youtube.com/*
-// @match        *://m.youtube.com/*
-// @match        *://www.youtube-nocookie.com/*
+// @match        *://www.youtube.com/watch*
 // @match        *://www.bilibili.com/video/*
-// @exclude      *://www.youtube.com/live_chat*
 // @icon         https://s2.loli.net/2024/04/28/WEkjH9iy51z63Of.jpg
 // @grant        none
 // @license      MIT
